@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>County Population Map</title>
+    <style>
+        /* Set the size for the map container */
+        #map {
+            height: 600px;
+            width: 100%;
+        }
+    </style>
+
+    <!-- Include the Google Maps JavaScript API (replace `YOUR_API_KEY` with a valid key) -->
+    <script 
+       src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBnyTt0jbg8Dav9Pl0U1eFxfakYM3RWZ5Y&callback=initMap"
+       async defer>
+    </script>
+</head>
+<body onload="initMap()">
+
+<div id="map"></div>
+
+<script>
+    function initMap() {
+        // initialize the map and center it on the US
+        const map = new google.maps.Map(document.getElementById("map"), {
+            zoom: 4,
+            center: { lat: 37.0902, lng: -95.7129 },
+        });
+
+        // go to the /counties-data/ webpage and fetch the json data
+        fetch("/counties-data/")
+            .then(response => response.json()) // from the response of the fetch convert it to a json
+            .then(geojson => {
+                addPolygonsToMap(geojson, map);
+            }) // once we have the json data (the geojson variable represents the json data) send it to the addpolygonstomap function
+            .catch(error => {
+                console.error("Error loading GeoJSON:", error);
+            });
+    }
+
+    function addPolygonsToMap(geojson, map) {
+        geojson.features.forEach(feature => {
+            const geometry = feature.geometry; //get the geometry/border 
+            const properties = feature.properties; //get the properties
+
+            // Safely read the population or default to 0 if unavailable
+            const population = properties["Total Population"] || 0; //from the properties feature extract the total population property
+
+            // Determine the fill color based on population
+            const fillColor = getPopulationColor(population); //get the color based on the population
+
+
+            //function to just draw the border
+            const drawPolygon = (coordinates) => {
+                // Convert GeoJSON coordinates ([lng, lat]) to Google Maps LatLng objects
+                const paths = coordinates.map(ring =>
+                    ring.map(coord => ({ lat: coord[1], lng: coord[0] }))
+                );
+
+                // Create the polygon
+                const polygon = new google.maps.Polygon({
+                    paths: paths,
+                    strokeColor: "#ffffff",
+                    strokeOpacity: 0.5,
+                    strokeWeight: 0.5,
+                    fillColor: fillColor,
+                    fillOpacity: 0.7,
+                    map: map
+                });
+
+                // Add a click listener to display an info window
+                polygon.addListener("click", (event) => {
+                    const infoWindow = new google.maps.InfoWindow({
+                        position: event.latLng,
+                        content: `
+                            <strong>${properties.NAME}</strong><br/>
+                            Population: ${
+                                properties["Total Population"] 
+                                ? properties["Total Population"].toLocaleString()
+                                : "Unknown"
+                            }
+                        `
+                    });
+                    infoWindow.open(map);
+                });
+            };
+
+            // Handle Polygon vs. MultiPolygon geometry
+            if (geometry.type === "Polygon") {
+                drawPolygon(geometry.coordinates);
+            } else if (geometry.type === "MultiPolygon") {
+                geometry.coordinates.forEach(polygonCoords => {
+                    drawPolygon(polygonCoords);
+                });
+            }
+        });
+    }
+
+    /**
+     * Returns a color that changes for every 5,000 in population.
+     * We'll just vary the hue in HSL so that each "bin" (every 5,000) has a different color.
+     */
+    function getPopulationColor(population) {
+        // Determine the "bin" based on 5,000 increments
+        const colorIndex = Math.floor(population / 5000);
+        // Shift hue by 10 degrees per bin
+        const hue = (colorIndex * 10) % 360;
+        // You can tweak saturation and lightness as desired
+        return `hsl(${hue}, 70%, 50%)`;
+    }
+</script>
+
+</body>
+</html>
+
+</body>
+</html>
+
+
+    
+</body>
+</html>

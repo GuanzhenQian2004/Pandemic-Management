@@ -16,9 +16,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from map import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('data/', include('data.urls')),
+    path('counties-data/', views.json_view, name='county_map'),
+    path('us-map/',views.county_map, name='county-map'),
 ]
 
