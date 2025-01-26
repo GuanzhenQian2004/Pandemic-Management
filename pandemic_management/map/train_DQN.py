@@ -8,7 +8,7 @@ import torch.optim as optim
 import torch
 import torch.nn.functional as F
 
-from .pandemic_sim import TravelEnv
+from pandemic_sim import TravelEnv
 
 # -----------------------------------------
 # 1. Configuration / Hyperparameters

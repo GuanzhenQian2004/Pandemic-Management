@@ -2,7 +2,9 @@ import numpy as np
 import networkx as nx
 import gym
 from gym import spaces
-from .CityManager import CityManager
+from CityManager import CityManager
+import logging
+
 
 class TravelEnv(gym.Env):
     """Gym environment for simulating pandemic spread across cities with population-based infections."""
@@ -25,6 +27,14 @@ class TravelEnv(gym.Env):
         self._calculate_budget()
         self.edge_status = {edge: True for edge in self.edges}
         print("[DEBUG] Environment initialized successfully.\n")
+
+        logging.basicConfig(
+        filename='pandemic.log',              # Name of the log file
+        filemode='a',                    # Mode: 'a' for append, 'w' for overwrite
+        level=logging.DEBUG,             # Logging level
+        datefmt='%Y-%m-%d %H:%M:%S'      # Date format
+    )
+
 
     def _initialize_city_data(self, map_data_path):
         print(f"[DEBUG] Loading CityManager from: {map_data_path}")
@@ -110,7 +120,7 @@ class TravelEnv(gym.Env):
         city_densities = [city["density"] for city in self.city_manager.city_data.values()]
         total_density = sum(city_densities) if city_densities else 1
         max_density = max(city_densities) if city_densities else 1
-        self.budget = self.BASE_BUDGET_PER_CITY * self.n_cities * (total_density / max_density)
+        self.budget = 30000
         print(f"[DEBUG] Budget calculated: {self.budget:.2f}\n")
 
     # -------------------------------------------------------------------
@@ -243,7 +253,7 @@ class TravelEnv(gym.Env):
         """
         print(f"[DEBUG] step() called with action={action}")
         # 1. Budget increment
-        self.budget += 5000
+        self.budget += 1500
         print(f"[DEBUG] Budget increment -> New budget={self.budget:.2f}")
 
         # 2. Interpret action => cost
@@ -294,7 +304,7 @@ class TravelEnv(gym.Env):
             city_id = action - (num_edge_actions + num_city_actions)
             current_factor = self.marketing_cleanliness_factors[city_id]
             increment = 0.1
-            new_factor = min(current_factor + increment, 1.0)
+            new_factor = min(current_factor + increment, 0.4)
             change_in_factor = new_factor - current_factor
             self.marketing_cleanliness_factors[city_id] = new_factor
             cost_to_improve = 1000.0 * change_in_factor
@@ -337,6 +347,9 @@ class TravelEnv(gym.Env):
         print("\n[DEBUG] === ECONOMIC & HEALTH METRICS ===")
         print(f"[DEBUG] Total infections: {total_infected_after}")
         print(f"[DEBUG] Infection change: {infection_change} (Δ)")
+        with open('app.log', 'a') as log_file:
+            log_file.write(f"[DEBUG] Total infections: {total_infected_after}\n")
+            log_file.write(f"[DEBUG] Infection change: {infection_change} (Δ)\n")
         print(f"[DEBUG] Active edges: {len(self.edges) - num_closed_edges}/{len(self.edges)}")
         print(f"[DEBUG] Closed edges: {num_closed_edges}")
         print(f"[DEBUG] Cost penalty: {-scaled_cost:.4f}")
@@ -385,7 +398,7 @@ class TravelEnv(gym.Env):
         self.edge_status = {edge: True for edge in self.edges}
 
         # 5. Reset budget
-        self.budget = self.BASE_BUDGET_PER_CITY * self.n_cities
+        self.budget =  30000
         print(f"[DEBUG] Budget reset to {self.budget:.2f}")
 
         # 6. Seed an initial infection in city 0
