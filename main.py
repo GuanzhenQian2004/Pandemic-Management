@@ -1,7 +1,7 @@
 import torch
 import numpy as np
 import matplotlib.pyplot as plt
-from pandemic_sim import TravelEnv
+from pandemic_management.map.pandemic_sim import TravelEnv
 from collections import deque
 import random
 
