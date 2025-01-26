@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Error</title>
+</head>
+<body>
+    <h1>An Error Occurred</h1>
+    {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li style="color: red;">{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <a href="{% url 'upload_csv' %}">Go Back</a>
+</body>
+</html>

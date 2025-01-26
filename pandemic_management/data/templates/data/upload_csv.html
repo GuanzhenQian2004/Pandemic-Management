@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload CSV Files</title>
+</head>
+<body>
+    <h1>Upload County and Hospital Data</h1>
+    {% if messages %}
+        <ul>
+        {% for message in messages %}
+            <li style="color: {{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+        </ul>
+    {% endif %}
+    <p>Please upload the following CSV files:</p>
+    <ul>
+        <li><strong>County CSV:</strong> Must include headers: <code>county_name, total_population, total_uninsured_population, area_land_sqmi, area_water_sqmi, state</code></li>
+        <li><strong>Hospital CSV:</strong> Must include headers: <code>provider_id, hospital_name, rating, county_name, state</code>. The <code>county_name</code> field links the hospital to a single county.</li>
+    </ul>
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Upload</button>
+    </form>
+</body>
+</html>
