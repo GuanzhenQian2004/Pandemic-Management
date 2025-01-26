@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>View Data</title>
+    <style>
+        .collapsible {
+            cursor: pointer;
+            text-align: left;
+            outline: none;
+            font-size: 16px;
+            margin-bottom: 10px;
+            background-color: #f1f1f1;
+            padding: 10px;
+            border: none;
+            border-radius: 5px;
+        }
+
+        .content {
+            display: none;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            border: 1px solid black;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+    </style>
+    <script>
+        function toggleContent(button) {
+            const content = button.nextElementSibling;
+            if (content.style.display === "block") {
+                content.style.display = "none";
+            } else {
+                content.style.display = "block";
+            }
+        }
+    </script>
+</head>
+<body>
+    <h1>Current Database Data</h1>
+    <a href="{% url 'wipe_data' %}" style="background-color: red; color: white; padding: 10px; text-decoration: none; border-radius: 5px;">Wipe All Data</a>
+    
+    <button class="collapsible" onclick="toggleContent(this)">Counties</button>
+    <div class="content">
+        <table>
+            <tr>
+                <th>County Name</th>
+                <th>Total Population</th>
+                <th>Total Uninsured Population</th>
+                <th>Area Land (sq mi)</th>
+                <th>Area Water (sq mi)</th>
+                <th>State</th>
+            </tr>
+            {% for county in counties %}
+            <tr>
+                <td>{{ county.county_name }}</td>
+                <td>{{ county.total_population }}</td>
+                <td>{{ county.total_uninsured_population }}</td>
+                <td>{{ county.area_land_sqmi }}</td>
+                <td>{{ county.area_water_sqmi }}</td>
+                <td>{{ county.state }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+    
+    <button class="collapsible" onclick="toggleContent(this)">Hospitals</button>
+    <div class="content">
+        <table>
+            <tr>
+                <th>Provider ID</th>
+                <th>Hospital Name</th>
+                <th>Rating</th>
+                <th>County</th>
+                <th>State</th>
+            </tr>
+            {% for hospital in hospitals %}
+            <tr>
+                <td>{{ hospital.provider_id }}</td>
+                <td>{{ hospital.hospital_name }}</td>
+                <td>{{ hospital.rating }}</td>
+                <td>{{ hospital.county.county_name }}</td>
+                <td>{{ hospital.state }}</td>
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
+</body>
+</html>
