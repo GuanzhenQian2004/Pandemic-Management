@@ -127,11 +127,12 @@ class CityManager:
         # Typically, for a simple polygon: coords1[0][0] => first ring, first point
         # coords1 = [ [ [x1, y1], [x2, y2], ... ] ]
         try:
-            x1, y1 = coords1[0][0]
-            x2, y2 = coords2[0][0]
+            x1, y1 = coords1[0][0][:2]
+            x2, y2 = coords2[0][0][:2]
             return ((x1 - x2)**2 + (y1 - y2)**2) ** 0.5
         except (IndexError, TypeError):
             return float('inf')
+
 
     # -----------------------------------------------------------------
     # Data Updates

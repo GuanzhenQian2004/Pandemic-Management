@@ -334,8 +334,15 @@ class TravelEnv(gym.Env):
 
         # 2. Reset the graph (in case edges were removed)
         self.graph.clear()
+
+        # Add all nodes explicitly
+        for city_id in range(self.n_cities):
+            self.graph.add_node(city_id)
+
+        # Now add edges
         for edge in self.edges:
             self.graph.add_edge(edge[0], edge[1])
+
 
         # 3. Reset marketing/cleanliness factors
         self.marketing_cleanliness_factors = {
